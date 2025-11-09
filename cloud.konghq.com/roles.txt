@@ -1,0 +1,208 @@
+Here is the full text translation, maintaining the technical terminology as is.
+
+### Konnect `teams` and `roles`
+
+**Uses: Konnect Platform**
+
+To help secure and govern your environment, Konnect provides the ability to manage `authorization` using `teams` and `roles`. You can use Konnect’s predefined teams for a standard set of roles, or create `custom teams` with any roles you choose. Invite users and add them to these teams to manage user access.
+
+You must either be a member of the `Organization Admin` team, or be assigned the `Identity Admin` role, to manage users, teams, and roles.
+
+> **Note:** If the `Okta` integration is enabled, Konnect users and teams become `read-only`. An organization admin can view all registered users in Konnect, but cannot edit their team membership from the Konnect side. To manage automatically-created users, adjust user permissions through `Okta`, or adjust `team mapping`.
+
+-----
+
+### Access precedence
+
+Users can be part of any number of teams, and the roles gained from the teams are `additive`. For example, if you add a user to both the `Service Developer` and `Portal Viewer` teams, the user can create and manage `Services` through `API Products` and register applications through the `Dev Portal`.
+
+If two roles provide access to the same `entity`, the role with more access takes effect. For example, if you have the `Service Admin` role and the `Service Deployer` role on the same `Service`, the `Service Admin` role (the stronger one) takes precedence.
+
+-----
+
+### Geographic region assignment
+
+`Teams` and `roles` can be assigned to a specific `geographic region` in Konnect. Those teams and roles only access Konnect objects (such as `Services`) that are also located in the same geo they are assigned to.
+
+-----
+
+### Teams
+
+A `team` is a group of users with access to the same roles. Teams are useful for assigning access by functionality, where they can provide `granular access` to any group of Konnect resources based on roles.
+
+You can create and manage teams by navigating to `Organization > Teams` in Konnect.
+
+#### Predefined teams
+
+All new and existing organizations in Konnect have predefined default teams. The default teams can’t be modified or deleted.
+
+| Team | Description |
+| :--- | :--- |
+| **`Analytics Admin`** | Users can fully manage all `Analytics` content, which includes creating, editing, and deleting reports, as well as viewing the analytics summary. |
+| **`Analytics Viewer`** | Users can view the `Analytics` summary and report data. |
+| **`Organization Admin`** | Users can fully manage all entities and configuration in the organization. In addition to users granted the `Organization Admin` role, each organization also has one `Owner`, who always has this role and is the only user who can delete the organization. |
+| **`Organization Admin (Read Only)`** | Users can view all entities and configuration in the organization (read-only). |
+| **`Portal Admin`** | Users can fully manage all `Dev Portal` content, which includes Konnect service pages and supporting content, as well as `Dev Portal` configuration and Service connections. To manage app registration requests, members must also be assigned to the `Admin` or `Maintainer` roles for the corresponding Services. |
+| **`API Product Admin`** | Users can create and manage `API products`, including publishing `API product` versions to `Dev Portal` and enabling application registration. |
+| **`API Product Developer`** | Users can create and manage `versions` of `API products`. |
+| **`Control Plane Admin`** | Users can create and manage `Control Planes`. |
+
+#### Create a custom team
+
+`Custom teams` let organizations manage user access by grouping roles and permissions. Any user added to a custom team automatically inherits all roles assigned to that team.
+
+To create and configure a custom team:
+
+1.  **Create the team**
+    Send a `POST` request to the `/teams` `endpoint` with the name and description in the `request body`. Save the `team_id` from the response.
+2.  **Assign roles to the team**
+    Send a `POST` request to the `/assigned-roles` `endpoint` to grant the team specific roles.
+3.  **Add users to the team**
+    To give a user access to the team’s roles, you must assign them to the team. Send a `POST` request to the `/users` `endpoint`. Users can belong to multiple teams and inherit roles from each.
+4.  **(Optional) Enable group-to-team mappings**
+    If `SSO (Single Sign-On)` is enabled, you can configure Konnect to automatically map users to teams based on `group claims` from your `IdP`. To do this, send a `PUT` request to the `/team-mappings` `endpoint` with `team_ids` in the request body.
+
+-----
+
+### Roles
+
+`Roles` predefine access to a particular resource, or `instances` of a particular resource type (for example, `API product` roles can be `scoped` to a particular `API product` or all `API products` while `Control Plane` roles can be `scoped` to a particular `Control Plane` or all `Control Planes`).
+
+You can manage a user’s roles by navigating to `Organization > Users` in Konnect and clicking the `Role Assignments` tab for a user.
+
+#### Predefined roles
+
+Konnect provides the following predefined roles.
+
+**Analytics**
+The following describes the predefined roles for `Analytics`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Dashboard viewer`** | Users can view the `Analytics` summary and report data.<br> - Cannot edit `dashboards`.<br> - Can apply temporary filters during a session.<br> - Can only see dashboards they are explicitly granted access to. |
+
+**API Products**
+The following describes the predefined roles for `API Products`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Admin`** | This role grants full `write access` to an `API product` and its versions. |
+| **`Application Registration`** | This role grants permission to enable and disable application registration on an `API product`. |
+| **`Creator`** | This access is required to create `API products`. This access is not for creating sub-entities such as `versions` or `API specs`, etc. |
+| **`Deployer`** | This role grants permission to `deploy` and remove an `API product` from a `Control Plane`. |
+| **`Maintainer`** | This role grants all write permission to manage an `API product` and to administer `plugins`. |
+| **`Plugins Admin`** | This role grants full write permission to administer `plugins`. |
+| **`Publisher`** | This role grants permission to publish an `API product` to one or more portals. |
+| **`Viewer`** | Viewer has `read-only` access to an `API product` and its sub-entities. |
+
+**Control Planes**
+The following describes the predefined roles for `Control Planes`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Admin`** | This role grants full write access to all entities within a `Control Plane`. |
+| **`Certificate Admin`** | This role grants full write access to administer `certificates`. |
+| **`Consumer Admin`** | This role grants full write access to administer `consumers`. |
+| **`Creator`** | Creates a new `Control Plane` in an organization. The creator becomes the `owner` of the `Control Plane` they create. |
+| **`Deployer`** | This role grants full write access to administer `services`, `routes` and `plugins` necessary to deploy services in `Service Hub`. |
+| **`Gateway Service Admin`** | This role grants full write access to administer `gateway services`. |
+| **`Plugin Admin`** | This role grants full write access to administer `plugins`. |
+| **`Route Admin`** | This role grants full write access to administer `routes`. |
+| **`SNI Admin`** | This role grants full write access to administer `SNIs`. |
+| **`Upstream Admin`** | This role grants full write access to administer `upstreams`. |
+| **`Viewer`** | This role grants read only access to all entities within a `Control Plane`. |
+
+**Audit logs**
+The following describes the predefined roles for `Audit logs`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Admin`** | This role grants full write access to the `Audit log` configuration. |
+
+**Identity**
+The following describes the predefined roles for `Identity`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Admin`** | This role grants full write access to the `Identity` configuration. |
+
+**Mesh control planes**
+The following describes the predefined roles for `Mesh`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Admin`** | This role grants full write access to the related to `Mesh control planes`. |
+| **`Connector`** | This role grants a `mesh` zone to connect to the `mesh control plane` in Konnect. |
+| **`Creator`** | This role grants access to create new `Mesh control planes`. |
+| **`Viewer`** | This role grants access to read-only permissions to `Mesh control planes`. |
+
+**Networks**
+The following describes the predefined roles for `Networks`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Network Admin`** | Access to all read and write permissions related to a network. |
+| **`Network Creator`** | Access to creating networks. |
+| **`Network Viewer`** | Access to read-only permissions to networks. |
+
+**Catalog**
+The following describes the predefined roles for `Catalog`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Integration Admin`** | Can view and edit all `integrations` (install/authorize). |
+| **`Integration Viewer`** | Access to read-only permissions to integrations. |
+| **`Scorecard Viewer`** | Access read-only permissions related to `Scorecards`. |
+| **`Scorecard Admin`** | Can view and edit a select list of `Catalog` services, map resources to those services, manage all resources, and has read-only access to all integrations and integration instances. |
+| **`Service Admin`** | Can view and edit a select list of services, map resources to those services, and manage all resources and discovery rules. |
+| **`Service Creator`** | Can create new `Catalog` services, becomes the `Service Admin` for any service they create, and can view and edit all resources. Includes read-only access to all integrations and integration instances. This role does not grant access to existing services or their configurations. See the `Service Admin` role. This role does not grant write access to integration instances. See the `Integration Admin` role. |
+| **`Service Viewer`** | Can view a select list of services and all resources and discovery rules. |
+
+**Dev Portal**
+The following describes the predefined roles for `Dev Portal`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Admin`** | `Owner` of an existing `Dev Portal` instance. The owner has full write access related to any developers and applications in the organization. |
+| **`Appearance Maintainer`** | Access the `Portal` instance and edit its `appearance`. |
+| **`Creator`** | Create new `Portals`. |
+| **`Maintainer`** | Edit, view, and delete `Dev Portal` applications, and view developers. |
+| **`Product Publisher`** | Manage publishing products to a `Dev Portal`. |
+| **`Viewer`** | Read-only access to `Dev Portal` developers and applications. |
+
+**Application auth strategies**
+The following describes the predefined roles for `application auth strategies`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Creator`** | Create new `app auth strategies`. |
+| **`Maintainer`** | Edit one or all `app auth strategies`. |
+| **`Viewer`** | Read-only access to one or all `app auth strategies`. |
+
+**DCR (Dynamic Client Registration)**
+The following describes the predefined roles for `DCR`:
+
+| Role | Description |
+| :--- | :--- |
+| **`Creator`** | Create new `DCR` providers. |
+| **`Maintainer`** | Edit one or all `DCR` providers. |
+| **`Viewer`** | Read-only access to one or all `DCR` providers. |
+
+-----
+
+### FAQs
+
+**Q: What is required to manage users, teams, and roles in Konnect?**
+A: You must be part of the `Organization Admin` team to manage users, teams, and roles.
+
+**Q: What is a `team` in Konnect?**
+A: A team is a group of users with access to the same roles. Teams allow assigning access to Konnect resources based on roles.
+
+**Q: What is a `role` in Konnect?**
+A: A role defines predefined access to a particular resource or instances of a resource type. For example, `API product` roles can be scoped to a specific `API product` or all `API products`, while `Control Plane` roles can be scoped to a specific `Control Plane` or all `Control Planes`.
+
+**Q: Can predefined teams in Konnect be modified or deleted?**
+A: No, predefined teams have fixed role sets that cannot be modified or deleted.
+
+**Q: I have the `API Products Publisher` role for the `API product` I want to publish, why don’t I see any classic `Dev Portals` that I can publish to?**
+A: To publish `API products` to a classic `Dev Portal`, you need at least a `Viewer` role for `Dev Portal` in addition to the `API Products Publisher` role.
